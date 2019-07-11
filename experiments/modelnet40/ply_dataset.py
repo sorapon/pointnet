@@ -64,6 +64,13 @@ def get_test_dataset(num_point=1024):
     return ConcatenatedDataset(
         *(PlyDataset(filepath, num_point=num_point, augment=False) for filepath in test_files))
 
+def get_test_data(num_point=1024):
+    print('get test num_point ', num_point)
+    test_files = provider.getDataFiles(
+        os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/test_files.txt'))
+    print("test_file : {}".format(test_files))
+    data = (PlyDataset(filepath, num_point=num_point, augment=False) for filepath in test_files)
+    return data
 
 
 

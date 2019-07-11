@@ -1,0 +1,17 @@
+{
+    "dropout_ratio": 0,
+    "use_bn": 1,
+    "trans": 1,
+    "residual": 0,
+    "method": "point_cls",
+    "num_point": 2000,
+    "epoch": 250,
+    "gpu": 0,
+    "resume": "",
+    "seed": 777,
+    "normalize": 0,
+    "batchsize": 1,
+    "out": "result",
+    "protocol": 2,
+    "model_filename": "model.npz"
+}

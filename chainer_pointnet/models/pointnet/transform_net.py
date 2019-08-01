@@ -54,6 +54,8 @@ class TransformModule(chainer.Chain):
         h = self.conv_block1(x)
         h = self.conv_block2(h)
         h = self.conv_block3(h)
+        print(h.shape)
+        print(h.shape[2:])
         h = functions.max_pooling_2d(h, ksize=h.shape[2:])
         # h: (minibatch, K, 1, 1)
         h = functions.relu(self.fc4(h))

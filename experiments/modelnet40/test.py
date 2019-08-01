@@ -8,12 +8,12 @@ import numpy as np
 import time
 
 import chainer
-
 from chainer import iterators
 from chainer import serializers
 from chainer.dataset import to_device
 from chainer.datasets import TransformDataset
 from chainer.cuda import to_cpu
+import chainer.computational_graph as c
 
 from chainer_pointnet.models.kdcontextnet.kdcontextnet_cls import KDContextNetCls
 from chainer_pointnet.models.kdnet.kdnet_cls import KDNetCls
@@ -177,18 +177,19 @@ def main():
     x_test, t_test = concat_examples(x, device)
     with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
         y, t1, t2 = classifier.calc(x_test)
-    y = y.array
-    y = to_cpu(y)
+    y_arr = y.array
+    y_arr = to_cpu(y_arr)
 
     time2 = time.time()
     elapsed_time = time2-time1
     ## show result
     print("Estimated Label is : ", end="")
     for k in range (0, args.batchsize-1):
-        print(y[k].argmax(), end=" "),
-    print(y[args.batchsize-1].argmax())
+        print(y_arr[k].argmax(), end=" "),
+    print(y_arr[args.batchsize-1].argmax())
     print("Acutual Label is   : {}".format(t_test))
     print("Elapsed Time : {}".format(elapsed_time))
+
 
 if __name__ == '__main__':
     main()

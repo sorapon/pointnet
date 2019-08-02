@@ -18,10 +18,10 @@ from chainer_pointnet.models.kdcontextnet.kdcontextnet_cls import \
     KDContextNetCls
 from chainer_pointnet.models.kdnet.kdnet_cls import KDNetCls
 from chainer_pointnet.models.pointnet.pointnet_cls import PointNetCls
+from chainer_pointnet.models.pointnet.pointnet_pose import PointNetPose
 from chainer_pointnet.models.pointnet2.pointnet2_cls_msg import PointNet2ClsMSG
 from chainer_pointnet.models.pointnet2.pointnet2_cls_ssg import PointNet2ClsSSG
 
-from ply_dataset import get_train_dataset, get_test_dataset
 
 from chainer_pointnet.utils.kdtree import calc_max_level
 
@@ -46,6 +46,7 @@ def main():
     parser.add_argument('--use_bn', type=strtobool, default='true')
     parser.add_argument('--normalize', type=strtobool, default='false')
     parser.add_argument('--residual', type=strtobool, default='false')
+    parser.add_argument('--pose_estimate', '-p', type=strtobool, default='false')
     args = parser.parse_args()
 
     seed = args.seed
@@ -53,7 +54,14 @@ def main():
     num_point = args.num_point
     out_dir = args.out
     num_class = 40
+    num_pose = 6
     debug = False
+
+    if method == 'point_pose':
+        from pose_dataset import get_train_dataset, get_test_dataset
+    else:
+        from ply_dataset import get_train_dataset, get_test_dataset
+
     try:
         os.makedirs(out_dir, exist_ok=True)
         import chainerex.utils as cl
@@ -108,6 +116,13 @@ def main():
               .format(trans, use_bn, dropout_ratio))
         model = PointNetCls(
             out_dim=num_class, in_dim=3, middle_dim=64, dropout_ratio=dropout_ratio,
+            trans=trans, trans_lam1=0.001, trans_lam2=0.001, use_bn=use_bn,
+            residual=residual)
+    elif method == 'point_pose':
+        print('Train PointNetCls model... trans={} use_bn={} dropout={}'
+              .format(trans, use_bn, dropout_ratio))
+        model = PointNetPose(
+            out_dim=num_pose, in_dim=3, middle_dim=64, dropout_ratio=dropout_ratio,
             trans=trans, trans_lam1=0.001, trans_lam2=0.001, use_bn=use_bn,
             residual=residual)
     elif method == 'point2_cls_ssg':

@@ -10,6 +10,8 @@ import os
 import sys
 import numpy as np
 import h5py
+from tqdm import tqdm
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
@@ -99,10 +101,30 @@ def load_h5(h5_filename):
     f = h5py.File(h5_filename)
     data = f['data'][:]
     label = f['label'][:]
+    # print(data.shape)
     return (data, label)
 
 def loadDataFile(filename):
     return load_h5(filename)
+
+def loadDataFile_with_pose(filename):
+    f = h5py.File(filename)
+    n_data = 10000
+    num_point = 1000
+    cloud = []
+    pose = []
+    cloud_append = cloud.append
+    pose_append = pose.append
+    for n in tqdm(range(0,n_data)):
+        cloud_append(f["data_"+str(n+1)]['pointcloud'].value[:num_point, :].astype(np.float32))
+        # cloud_append(f["data_"+str(n+1)]['pointcloud'].value.astype(np.float32))
+        pose_append(f["data_"+str(n+1)]['pose'].value[:6])
+    cloud = np.array(cloud)
+    pose = np.array(pose, dtype=np.float32)
+    # print(cloud.shape)
+    # print(pose.shape)
+    return (cloud, pose)
+
 
 def load_h5_data_label_seg(h5_filename):
     f = h5py.File(h5_filename)
@@ -114,3 +136,8 @@ def load_h5_data_label_seg(h5_filename):
 
 def loadDataFile_with_seg(filename):
     return load_h5_data_label_seg(filename)
+
+if __name__ == '__main__':
+    filename = "data/modelnet40_ply_hdf5_2048/cloud_hd_10000.hdf5"
+    loadDataFile_with_pose(filename)
+    load_h5("data/modelnet40_ply_hdf5_2048/ply_data_test0.h5")
